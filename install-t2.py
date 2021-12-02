@@ -4,7 +4,7 @@
 
 
 # This is a script that installs necessary drivers for the MacBook Pro 16,1
-# Copyright (C) 2021 appleplectic
+# Copyright (C) 2021 Appleplectic
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@
 # This script is soley for bundling these together for an easy-to-install way.
 
 # Modules used:
-# os, re, sys, shutil, subprocess, argparse (usually part of Python)
+# os, sys, shutil, subprocess, argparse (usually part of Python)
 # PyGit2 + dependencies
 # Requests + dependencies
 # Wget + dependencies
