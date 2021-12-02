@@ -5,11 +5,12 @@ Need help? The Discord is a great place to start: https://discord.gg/wAyMNZrmHR
 
 ## Requirements
 - Python 3.7+
-- os, re, sys, shutil, subprocess, argparse
+- os, re, sys, shutil, subprocess, argparse (included with Python)
 - pygit2
 - requests
 - wget
-Install:
+
+Install dependencies:
 ```
 #Debian
 sudo apt-get install python3 python3-pip -y
