@@ -20,6 +20,15 @@ sudo pacman -S python3 python3-pip
 pip3 install -r requirements.txt
 ```
 
+## To-do
+
+IN PROGRESS: Change /etc/default/grub for the user
+Coming Soon: Offline mode
+Later: Download wifi firmware online
+TBD: Auto select kernel
+TBD: Fedora support
+TBD: Auto-detect arch-based or debian-based
+
 ## Credits
 
 T2 Linux Wiki for the overall how-to - https://wiki.t2linux.org (https://github.com/t2linux/wiki/)
