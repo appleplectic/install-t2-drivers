@@ -39,11 +39,11 @@
 # This script only works on T2 Macs
 
 # TO-DO:
-# After release: Download wifi firmware online
+# Later: Download wifi firmware online
 # IN PROGRESS: Change /etc/default/grub for the user
-# After release: Offline mode
-# After release: Auto select kernel
-# After release: Fedora support
+# Soon: Offline mode
+# TBD: Auto select kernel
+# TBD: Fedora support
 # TBD: Auto-detect arch-based or debian-based
 
 #====START CODE====
