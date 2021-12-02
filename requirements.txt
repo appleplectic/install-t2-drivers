@@ -1,0 +1,3 @@
+requests
+pygit2
+wget
