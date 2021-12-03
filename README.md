@@ -23,17 +23,28 @@ pip3 install -r requirements.txt
 ## To-do
 
 IN PROGRESS: Change /etc/default/grub for the user
+
 Coming Soon: Offline mode
-Later: Download wifi firmware online
+
+Later: Download WiFi firmware online
+
 TBD: Auto select kernel
+
 TBD: Fedora support
+
 TBD: Auto-detect arch-based or debian-based
+
 
 ## Credits
 
 T2 Linux Wiki for the overall how-to - https://wiki.t2linux.org (https://github.com/t2linux/wiki/)
+
 kevineinarsson for the audio files - https://gist.github.com/kevineinarsson/8e5e92664f97508277fefef1b8015fba
+
 jamlam for the patched kernels - https://github.com/jamlam/mbp-16.1-linux-wifi
+
 aunali1 for the BCE modules - https://github.com/aunali1/apple-bce-arch
+
 T2Linux for the Touchbar and ALB modules - https://github.com/t2linux/apple-ib-drv
+
 The Linux on T2 Macs Discord: https://discord.gg/wAyMNZrmHR
