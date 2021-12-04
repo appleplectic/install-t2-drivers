@@ -318,8 +318,12 @@ def install_audiofix(model_id):
 
 
 def modify_grub():
+
     if not os.path.isfile('/etc/default/grub'):
+        print('Failed to find /etc/default/grub. Skipping...')
         return
+
+    shutil.copy('/etc/default/grub', '/etc/default/grub.old')
 
     with open('/etc/default/grub', 'r', encoding='utf-8') as grub:
         lines = grub.read()
@@ -335,6 +339,7 @@ def modify_grub():
     with open('/etc/default/grub', 'w', encoding='utf-8') as grub:
         grub.write(nlines)
 
+    subprocess.run('grub-mkconfig -o /boot/grub/grub.cfg')
 
 
 if __name__ == '__main__':
