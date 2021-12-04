@@ -350,9 +350,8 @@ if __name__ == '__main__':
     os.mkdir('/tmp/install-t2')
     os.chdir('/tmp/install-t2')
 
-    for line in subprocess.check_output('lspci').decode('utf-8').splitlines():
-        if 'Broadcom' in line:
-            lspci = re.search(r'BCM(\d{4})', line).group(1)
+    unparsed = subprocess.check_output('lspci -d \'14e4:*\'').decode('utf-8')
+    lspci = re.search(r'BCM(\d{4})', unparsed).group(1)
 
     # ArgParse
     DESC = 'Script to install drivers for T2 Macs.\nInstalls patched kernel, WiFi drivers, BCE drivers (for keyboard/touchpad), iBridge (touchbar), and Audio drivers.\nNeed help? See https://wiki.t2linux.org or https://discord.gg/fsaU8nbaRT!'
