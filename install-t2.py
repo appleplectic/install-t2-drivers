@@ -39,7 +39,6 @@
 # This script only works on T2 Macs
 
 # TO-DO:
-# Soon: Download wifi firmware online
 # Later: Offline mode
 # TBD: Auto select kernel
 # Maybe: Fedora support
@@ -53,6 +52,8 @@ import re
 import shutil
 import subprocess
 import sys
+
+from urllib.error import HTTPError
 
 import pygit2
 import requests
@@ -70,7 +71,7 @@ def check_compatibility():
     try:
         requests.get('https://www.google.com/').status_code
     except:
-        raise ConnectionRefusedError('This device does not appear to have an internet connection. Please connect Ethernet, then try again.')
+        raise ConnectionRefusedError('This device does not appear to have an internet connection. Please connect Ethernet, then try again.') from None
 
 
 
@@ -365,16 +366,17 @@ if __name__ == '__main__':
     wifi.add_argument('-w', '--no-wifi', action='store_true', help='Don\'t install the WiFi firmware')
     wifi.add_argument('-c', '--wifi-chipset', help='WiFi chipset number (i.e. 4364); see https://wiki.t2linux.org/guides/wifi/. Default tries to parse lspci', default=lspci)
     wifi.add_argument('-f', '--filepaths', help='Absolute filepaths to the 3 WiFi firmware files (.trx, .clmb, & .txt), seperated by semicolons', default=None)
+    wifi.add_argument('--ioreg', help='`ioreg -l | grep RequestedFiles` output (in one line) from macOS - tries to use this to download files online', default=None)
 
     ibridge = parser.add_argument_group('ibridge')
     ibridge.add_argument('-i', '--no-ibridge', help='Don\'t install iBridge drivers.')
     ibridge.add_argument('-n', '--ib-num', help='Configuration number for Touchbar (see: https://wiki.t2linux.org/guides/dkms/#module-configuration)', default='2')
-    ibridge.add_argument('--backlight', action='store_true', help='Install the Backlight drivers. WARNING: UNSTABLE & ONLY FOR 16,1')
+    ibridge.add_argument('--backlight', action='store_true', help='Install the Backlight drivers. WARNILE & ONLY FOR 16,1')
 
     kernels = parser.add_argument_group('kernels')
     kernels.add_argument('--mojave', action='store_true', help='Install the Mojave-patched WiFi kernel')
     kernels.add_argument('--bigsur', action='store_true', help='Install the Big Sur-patched WiFi kernel')
-    kernels.add_argument('--no-grub', action='store_true', help='Don\'t modify the /etc/default/grub file')
+    kernels.add_argument('-g', '--no-grub', action='store_true', help='Don\'t modify the /etc/default/grub file')
     parser.add_argument('-k', '--no-kernel', action='store_true', help='Don\'t install the custom kernel')
 
     parsed = parser.parse_args()
@@ -389,31 +391,47 @@ if __name__ == '__main__':
     if not parsed.mojave and not parsed.bigsur and not parsed.no_kernel:
         parser.error('a kernel version, or no kernel install, must be specified')
 
-    if (parsed.wifi_chipset is None or parsed.filepaths is None) and not parsed.no_wifi:
-        parser.error('a wifi chipset and wifi files, or no wifi, should be specified')
-
+    if (parsed.wifi_chipset is None or (parsed.filepaths is None and parsed.ioreg is None)) and not parsed.no_wifi:
+        parser.error('either failed to parse the wifi chipset, or filepaths or ioreg were not specified')
 
     wifi_id = parsed.wifi_chipset
-    if wifi_id is None:
-        parser.error('failed to parse lspci - manually enter the wifi chipset using --wifi-chipset')
 
 
     if not parsed.no_wifi:
         # Getting filepaths for the Wifi firmware files, and formatting them
-        fps = parsed.filepaths
-        fps = fps.strip(';').strip().split(';')
-        escaped = []
-        for file in fps:
-            escapedf = file.strip().replace(' ', '\ ').replace(r'\\',r'\b'.replace('b',''))
-            escaped.append(escapedf)
-        for file in escaped:
-            if not file.endswith('.trx') or not file.endswith('.clmb') or not file.endswith('.txt'):
-                parser.error('invalid WiFi files - bad file extentions')
+        if parsed.filepaths is not None:
+            fps = parsed.filepaths
+            fps = fps.strip(';').strip().split(';')
+            escaped = []
+            for file in fps:
+                escapedf = file.strip().replace(' ', '\ ').replace(r'\\',r'\b'.replace('b',''))
+                escaped.append(escapedf)
+            for file in escaped:
+                if not file.endswith('.trx') or not file.endswith('.clmb') or not file.endswith('.txt'):
+                    parser.error('invalid WiFi files - bad file extentions')
 
-            if not os.path.isfile(file):
-                parser.error('invalid WiFi filepaths - do not exist')
+                if not os.path.isfile(file):
+                    parser.error('invalid WiFi filepaths - do not exist')
 
-        install_wifi(model_id, wifi_id, escaped)
+            install_wifi(model_id, wifi_id, escaped)
+        elif parsed.ioreg is not None:
+            research = re.search(r'"Firmware"="(.*?)"(.*?)"Regulatory"="(.*?)"(.*?)"NVRAM"="(.*?)"', parsed.ioreg)
+            filelist = []
+            filelist.append(research.group(1))
+            filelist.append(research.group(3))
+            filelist.append(research.group(5))
+            filepaths = []
+            for file in filelist:
+                try:
+                    fname = wget.download('https://raw.githubusercontent.com/AdityaGarg8/macOS-Big-Sur-WiFi-Firmware/main/' + file)
+                except HTTPError:
+                    try:
+                        fname = wget.download('https://packages.aunali1.com/apple/wifi-fw/18G2022/' + file)
+                    except HTTPError:
+                        raise FileNotFoundError(f'Failed to download WiFi file {file}. It may not be in the archives.') from None
+                filepaths.append(os.getcwd() + '/' + fname)
+            install_wifi(model_id, wifi_id, filepaths)
+
 
 
     # Patched Kernel install
