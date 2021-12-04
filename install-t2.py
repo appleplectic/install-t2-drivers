@@ -39,9 +39,8 @@
 # This script only works on T2 Macs
 
 # TO-DO:
-# Later: Offline mode
+# TBD: Offline mode
 # TBD: Auto select kernel
-# Maybe: Fedora support
 
 #====START CODE====
 
@@ -108,6 +107,18 @@ def install_kernel(distro:str, ver:str):
             for url in download_urls:
                 filename = wget.download(url)
                 subprocess.run(['apt-get', 'install', f'./{filename}', '-y'])
+        elif distro == 'fedora':
+            # Have to use mbp16 one
+            jsonreq = requests.get('https://api.github.com/repos/mikeeq/mbp-fedora-kernel/releases/43328558').json()
+            download_urls = []
+            for dic in jsonreq['assets']:
+                download_urls.append(dic['browser_download_url'])
+            for url in download_urls:
+                if 'packages.zip' in url or 'sha256' in url:
+                    continue
+                filename = wget.download(url)
+                subprocess.run(['rpm', f'-i {filename}'])
+
     elif ver == 'mojave':
         if distro == 'arch':
             jsonreq = requests.get("https://api.github.com/repos/aunali1/linux-mbp-arch/releases/latest").json()
@@ -126,6 +137,16 @@ def install_kernel(distro:str, ver:str):
             for url in download_urls:
                 filename = wget.download(url)
                 subprocess.run(['apt-get', 'install', f'./{filename}', '-y'])
+        elif distro == 'fedora':
+            jsonreq = requests.get('https://api.github.com/repos/mikeeq/mbp-fedora-kernel/releases/latest').json()
+            download_urls = []
+            for dic in jsonreq['assets']:
+                download_urls.append(dic['browser_download_url'])
+            for url in download_urls:
+                if 'packages.zip' in url or 'sha256' in url:
+                    continue
+                filename = wget.download(url)
+                subprocess.run(['rpm', f'-i {filename}'])
 
 
 
@@ -142,8 +163,12 @@ def install_bce(distro:str):
                 continue
             filename = wget(url)
         subprocess.run(['pacman', f'-U {filename}'])
-    elif distro == 'debian':
-        subprocess.run(['apt-get', 'install', 'dkms', '-y'])
+    elif distro == 'debian' or distro == 'fedora':
+        if distro == 'debian':
+            subprocess.run(['apt-get', 'install', 'dkms', '-y'])
+        else:
+            subprocess.run(['dnf', 'install', 'dkms', '-y'])
+
         pygit2.clone_repository('https://github.com/t2linux/apple-bce-drv', '/usr/src/apple-bce-r183.c884d9c')
         with open('/usr/src/apple-bce-r183.c884d9c/dkms.conf', 'w', encoding='utf-8') as conf:
             conf.write('''PACKAGE_NAME="apple-bce"
@@ -165,6 +190,8 @@ def install_ib(distro:str, tb_config_num:str, backlight:bool):
         subprocess.run(['pacman', '-S dkms'])
     elif distro == 'debian':
         subprocess.run(['apt-get', 'install', 'dkms', '-y'])
+    elif distro == 'fedora':
+        subprocess.run(['dnf', 'install', 'dkms', '-y'])
 
     os.mkdir('/usr/src/apple-ibridge-0.1')
 
@@ -390,6 +417,8 @@ if __name__ == '__main__':
         DISTRO = 'debian'
     elif os.path.isfile('/usr/bin/pacman'):
         DISTRO = 'arch'
+    elif os.path.isfile('/usr/bin/dnf'):
+        DISTRO = 'fedora'
     else:
         parser.error('either this distribution is not supported, or the script failed to parse the package manager')
 
@@ -400,6 +429,13 @@ if __name__ == '__main__':
         parser.error('either failed to parse the wifi chipset, or filepaths or ioreg were not specified')
 
     wifi_id = parsed.wifi_chipset
+
+    if DISTRO == 'debian':
+        subprocess.run(['apt-get', 'update'])
+    elif DISTRO == 'arch':
+        subprocess.run(['pacman', '-Sy'])
+    elif DISTRO == 'fedora':
+        subprocess.run(['dnf', 'check-update', '-y'])
 
 
     if not parsed.no_wifi:

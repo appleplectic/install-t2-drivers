@@ -23,13 +23,9 @@ pip3 install -r requirements.txt
 
 ## To-do
 
-Coming Soon: Download WiFi firmware online
-
-Later: Offline mode
+TBD: Offline mode
 
 TBD: Auto select kernel
-
-Maybe: Fedora support
 
 
 ## Credits
