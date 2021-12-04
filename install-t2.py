@@ -98,7 +98,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['pacman', '-U {filename}'])
+                subprocess.run(['pacman', f'-U {filename}'])
         elif distro == 'debian':
             # Have to use 5.13.15 and not 5.13.19
             jsonreq = requests.get("https://api.github.com/repos/marcosfad/mbp-ubuntu-kernel/releases/49398102").json()
@@ -107,7 +107,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['apt-get', 'install', f'./filename', '-y'])
+                subprocess.run(['apt-get', 'install', f'./{filename}', '-y'])
     elif ver == 'mojave':
         if distro == 'arch':
             jsonreq = requests.get("https://api.github.com/repos/aunali1/linux-mbp-arch/releases/latest").json()
