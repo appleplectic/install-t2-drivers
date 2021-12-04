@@ -1,6 +1,6 @@
-#!/bin/bash python3
-# -*- coding: utf-8 -*-
-#install-t2.py
+#!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+# install-t2.py
 
 
 # This is a script that installs necessary drivers for the MacBook Pro 16,1
@@ -41,8 +41,6 @@
 # TO-DO:
 # TBD: Offline mode
 # TBD: Auto select kernel
-
-#====START CODE====
 
 
 import argparse
@@ -501,5 +499,3 @@ if __name__ == '__main__':
         modify_grub()
 
     print('Script is complete!')
-
-#====END CODE====
