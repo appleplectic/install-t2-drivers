@@ -39,18 +39,17 @@
 # This script only works on T2 Macs
 
 # TO-DO:
-# Later: Download wifi firmware online
-# IN PROGRESS: Change /etc/default/grub for the user
-# Soon: Offline mode
+# Soon: Download wifi firmware online
+# Later: Offline mode
 # TBD: Auto select kernel
-# TBD: Fedora support
-# TBD: Auto-detect arch-based or debian-based
+# Maybe: Fedora support
 
 #====START CODE====
 
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -317,6 +316,26 @@ def install_audiofix(model_id):
 
 
 
+def modify_grub():
+    if not os.path.isfile('/etc/default/grub'):
+        return
+
+    with open('/etc/default/grub', 'r', encoding='utf-8') as grub:
+        lines = grub.read()
+
+    for line in lines.splitlines():
+        if 'GRUB_CMDLINE_LINUX=""' in line:
+            line = line[:-2]
+            line += 'efi=noruntime pcie_ports=compat acpi_osi=linux iommu=pt intel_iommu=on"\n'
+            break
+
+    nlines = lines.replace('GRUB_CMDLINE_LINUX=""', line)
+
+    with open('/etc/default/grub', 'w', encoding='utf-8') as grub:
+        grub.write(nlines)
+
+
+
 if __name__ == '__main__':
 
     print('This script installs T2 drivers on your Mac.')
@@ -331,6 +350,9 @@ if __name__ == '__main__':
     os.mkdir('/tmp/install-t2')
     os.chdir('/tmp/install-t2')
 
+    for line in subprocess.check_output('lspci').decode('utf-8').splitlines():
+        if 'Broadcom' in line:
+            lspci = re.search(r'BCM(\d{4})', line).group(1)
 
     # ArgParse
     DESC = 'Script to install drivers for T2 Macs.\nInstalls patched kernel, WiFi drivers, BCE drivers (for keyboard/touchpad), iBridge (touchbar), and Audio drivers.\nNeed help? See https://wiki.t2linux.org or https://discord.gg/fsaU8nbaRT!'
@@ -342,7 +364,7 @@ if __name__ == '__main__':
 
     wifi = parser.add_argument_group('wifi')
     wifi.add_argument('-w', '--no-wifi', action='store_true', help='Don\'t install the WiFi firmware')
-    wifi.add_argument('-c', '--wifi-chipset', help='WiFi chipset number (i.e. 4364); see https://wiki.t2linux.org/guides/wifi/', default=None)
+    wifi.add_argument('-c', '--wifi-chipset', help='WiFi chipset number (i.e. 4364); see https://wiki.t2linux.org/guides/wifi/. Default tries to parse lspci', default=lspci)
     wifi.add_argument('-f', '--filepaths', help='Absolute filepaths to the 3 WiFi firmware files (.trx, .clmb, & .txt), seperated by semicolons', default=None)
 
     ibridge = parser.add_argument_group('ibridge')
@@ -353,16 +375,17 @@ if __name__ == '__main__':
     kernels = parser.add_argument_group('kernels')
     kernels.add_argument('--mojave', action='store_true', help='Install the Mojave-patched WiFi kernel')
     kernels.add_argument('--bigsur', action='store_true', help='Install the Big Sur-patched WiFi kernel')
+    kernels.add_argument('--no-grub', action='store_true', help='Don\'t modify the /etc/default/grub file')
     parser.add_argument('-k', '--no-kernel', action='store_true', help='Don\'t install the custom kernel')
-
-    distros = parser.add_argument_group('distributions')
-    distros.add_argument('-arch', action='store_true', help='Arch Linux-based distros (Manjaro, Endeavour, etc.)')
-    distros.add_argument('-deb', action='store_true', help='Debian-based distros (Ubuntu, Mint, MX, etc.)')
 
     parsed = parser.parse_args()
 
-    if not parsed.deb and not parsed.arch:
-        parser.error('a distribution must be specified')
+    if os.path.isfile('/usr/bin/apt-get'):
+        DISTRO = 'debian'
+    elif os.path.isfile('/usr/bin/pacman'):
+        DISTRO = 'arch'
+    else:
+        parser.error('either this distribution is not supported, or the script failed to parse the package manager')
 
     if not parsed.mojave and not parsed.bigsur and not parsed.no_kernel:
         parser.error('a kernel version, or no kernel install, must be specified')
@@ -370,13 +393,10 @@ if __name__ == '__main__':
     if (parsed.wifi_chipset is None or parsed.filepaths is None) and not parsed.no_wifi:
         parser.error('a wifi chipset and wifi files, or no wifi, should be specified')
 
-    if parsed.deb:
-        DISTRO = 'debian'
-    elif parsed.arch:
-        DISTRO = 'arch'
-
 
     wifi_id = parsed.wifi_chipset
+    if wifi_id is None:
+        parser.error('failed to parse lspci - manually enter the wifi chipset using --wifi-chipset')
 
 
     if not parsed.no_wifi:
@@ -418,6 +438,9 @@ if __name__ == '__main__':
     if not parsed.no_audio:
         install_audiofix(model_id)
 
+    # GRUB
+    if not parsed.no_grub:
+        modify_grub()
 
     print('Script is complete!')
 

@@ -1,5 +1,6 @@
 # install-t2-drivers
-A Python script that installs the T2 Linux drivers for you. 
+
+A Python script that installs the T2 Linux drivers for you.
 See https://wiki.t2linux.org/ for how to get WiFi files, install drivers, view state of Linux on T2 Macs, etc.
 Need help? The Discord is a great place to start: https://discord.gg/wAyMNZrmHR
 
@@ -22,17 +23,13 @@ pip3 install -r requirements.txt
 
 ## To-do
 
-IN PROGRESS: Change /etc/default/grub for the user
+Coming Soon: Download WiFi firmware online
 
-Coming Soon: Offline mode
-
-Later: Download WiFi firmware online
+Later: Offline mode
 
 TBD: Auto select kernel
 
-TBD: Fedora support
-
-TBD: Auto-detect arch-based or debian-based
+Maybe: Fedora support
 
 
 ## Credits
