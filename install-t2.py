@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 # install-t2.py
 
+# WARNING: EXTREMELY UNSTABLE
 
 # This is a script that installs necessary drivers for the MacBook Pro 16,1
 # Copyright (C) 2021 Appleplectic
@@ -28,7 +29,7 @@
 #
 # The Linux on T2 Macs Discord: https://discord.gg/wAyMNZrmHR
 
-# This script is soley for bundling these together for an easy-to-install way.
+# This script is soley for bundling these together for an easy-to-install way - I do not own any of these repos.
 
 # Modules used:
 # os, sys, shutil, subprocess, argparse (usually part of Python)
@@ -36,11 +37,6 @@
 # Requests + dependencies
 # Wget + dependencies
 
-# This script only works on T2 Macs
-
-# TO-DO:
-# TBD: Offline mode
-# TBD: Auto select kernel
 
 
 import argparse

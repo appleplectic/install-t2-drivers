@@ -26,11 +26,12 @@ sudo pip3 install -r requirements.txt
 ```
 
 
-## To-do
+## To-Do
 
-Coming Soon: Offline mode
-
-TBD: Auto select kernel
+- Test Debian-based distros (SOON)
+- Test Arch-based distros (IN PROGRESS)
+- Test Fedora-based distros (LATER)
+- Eopkg support (LATER)
 
 
 
