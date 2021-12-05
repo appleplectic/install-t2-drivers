@@ -389,6 +389,7 @@ if __name__ == '__main__':
     try:
         lspci = re.search(r'BCM(\d{4})', unparsed).group(1)
     except AttributeError:
+        lspci = None
         print('Failed to parse lspci. Make sure to fill out wifi chipset or filepaths.')
 
     # ArgParse
