@@ -33,9 +33,9 @@
 
 # Modules used:
 # os, sys, shutil, subprocess, argparse (usually part of Python)
-# PyGit2 + dependencies
-# Requests + dependencies
-# Wget + dependencies
+# pygit2 + dependencies
+# requests + dependencies
+# wget + dependencies
 
 
 
@@ -146,6 +146,7 @@ def install_kernel(distro:str, ver:str):
         fstab.write('\nefivarfs /sys/firmware/efi/efivars efivarfs ro,remount 0 0')
 
 
+
 def install_bce(distro:str):
 
     if distro == 'arch':
@@ -173,8 +174,7 @@ MAKE[0]="make KVERSION=$kernelver"
 CLEAN="make clean"
 BUILT_MODULE_NAME[0]="apple-bce"
 DEST_MODULE_LOCATION[0]="/kernel/drivers/misc"
-AUTOINSTALL="yes"
-''')
+AUTOINSTALL="yes"''')
         vmlinuz = []
         for file in os.listdir('/boot'):
             if 'vmlinuz-' in file:
@@ -249,12 +249,15 @@ fi''')
 
 
 
-def install_audiofix(model_id):
+def install_audiofix(model_id:str, stereo:bool):
 
     home = os.path.expanduser('~')
 
     if model_id == 'MacBookPro16,1':
-        jsonreq = requests.get('https://api.github.com/gists/8e5e92664f97508277fefef1b8015fba').json()
+        if stereo:
+            jsonreq = requests.get('https://api.github.com/gists/67d23a7c7aa1ee51edcb3eb60cd6a893').json()
+        else:
+            jsonreq = requests.get('https://api.github.com/gists/8e5e92664f97508277fefef1b8015fba').json()
         if os.path.isdir('/usr/share/alsa/cards/') and os.path.isdir('/usr/share/pulseaudio/alsa-mixer/profile-sets/') and os.path.isdir('/usr/lib/udev/rules.d/') and os.path.isdir(home + '/.config/pulse/'):
             # PulseAudio
             for key in jsonreq['files'].keys():
@@ -272,6 +275,7 @@ def install_audiofix(model_id):
                     shutil.move(fname, home + '/.config/pulse/')
                 elif fname == 'daemon.conf':
                     shutil.move(fname, home + '/.config/pulse/')
+
         elif os.path.isdir('/usr/share/alsa/cards/') and os.path.isdir('/usr/share/alsa-card-profile/mixer/profile-sets/') and os.path.isdir('/usr/lib/udev/rules.d/') and os.path.isdir(home + '/.config/pulse/'):
             # PipeWire
             for key in jsonreq['files'].keys():
@@ -292,7 +296,7 @@ def install_audiofix(model_id):
                 elif fname == 'daemon.conf':
                     shutil.move(fname, home + '/.config/pulse/')
         else:
-            print('Please install PulseAudio or PipeWire and Alsa first.')
+            print('Please install PulseAudio or PipeWire first.')
 
     elif model_id == 'MacBookAir9,1':
         jsonreq = requests.get('https://api.github.com/gists/8b670ae29e0b7be2b73887f3f37a057b').json()
@@ -326,7 +330,7 @@ def install_audiofix(model_id):
                     wget.download('https://raw.githubusercontent.com/appleplectic/T2-Misc/main/91-pulseaudio-custom.rules')
                     shutil.move(fname, '/usr/lib/udev/rules.d/')
         else:
-            print('Please install PulseAudio or PipeWire and Alsa first.')
+            print('Please install PulseAudio or PipeWire first.')
 
     else:
         jsonreq = requests.get('https://api.github.com/gists/c357291e4e5c18894bea10665dcebffb').json()
@@ -360,7 +364,7 @@ def install_audiofix(model_id):
                     wget.download('https://raw.githubusercontent.com/appleplectic/T2-Misc/main/91-pulseaudio-custom.rules')
                     shutil.move(fname, '/usr/lib/udev/rules.d/')
         else:
-            print('Please install PulseAudio or PipeWire and Alsa first.')
+            print('Please install PulseAudio or PipeWire first.')
 
 
 
@@ -371,7 +375,7 @@ if __name__ == '__main__':
     check_compatibility()
 
     with open('/sys/devices/virtual/dmi/id/product_name', 'r', encoding='utf-8') as productname:
-        model_id = productname.read().strip().strip('\n')
+        model_id = productname.read().strip('\n').strip()
 
     # chdir to /tmp
     try:
@@ -382,7 +386,10 @@ if __name__ == '__main__':
     os.chdir('/tmp/install-t2')
 
     unparsed = subprocess.check_output('lspci -d \'14e4:*\'', shell=True).decode('utf-8')
-    lspci = re.search(r'BCM(\d{4})', unparsed).group(1)
+    try:
+        lspci = re.search(r'BCM(\d{4})', unparsed).group(1)
+    except AttributeError:
+        print('Failed to parse lspci. Make sure to fill out wifi chipset or filepaths.')
 
     # ArgParse
     DESC = 'Script to install drivers for T2 Macs.\nInstalls patched kernel, WiFi drivers, BCE drivers (for keyboard/touchpad), iBridge (touchbar), and Audio drivers.\nNeed help? See https://wiki.t2linux.org or https://discord.gg/fsaU8nbaRT!'
@@ -391,6 +398,7 @@ if __name__ == '__main__':
     bceaudio = parser.add_argument_group('bce/audio')
     bceaudio.add_argument('--no-bce', action='store_true', help='Don\'t install the BCE drivers')
     bceaudio.add_argument('--no-audio', action='store_true', help='Don\'t install the Audio configs')
+    bceaudio.add_argument('--stereo', action='store_true', help='Install stereo configurations instead of regular ones for better sounding 16,1 audio')
 
     wifi = parser.add_argument_group('wifi')
     wifi.add_argument('--no-wifi', action='store_true', help='Don\'t install the WiFi firmware')
@@ -452,6 +460,7 @@ if __name__ == '__main__':
                     parser.error('invalid WiFi filepaths - do not exist')
 
             install_wifi(model_id, wifi_id, escaped)
+
         elif parsed.ioreg is not None:
             research = re.search(r'"Firmware"="(.*?)"(.*?)"Regulatory"="(.*?)"(.*?)"NVRAM"="(.*?)"', parsed.ioreg)
             filelist = []
