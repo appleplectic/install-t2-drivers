@@ -1,8 +1,12 @@
 # install-t2-drivers
 
 A Python script that installs the T2 Linux drivers for you.
+
 See https://wiki.t2linux.org/ for how to get WiFi files, install drivers, view state of Linux on T2 Macs, etc.
+
 Need help? The Discord is a great place to start: https://discord.gg/wAyMNZrmHR
+
+Permalink: https://tinyurl.com/install-t2
 
 ## Requirements
 - Python 3.7+
