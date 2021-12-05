@@ -329,6 +329,8 @@ def install_audiofix(model_id):
                     os.remove('91-pulseaudio-custom.rules')
                     wget.download('https://raw.githubusercontent.com/appleplectic/T2-Misc/main/91-pulseaudio-custom.rules')
                     shutil.move(fname, '/usr/lib/udev/rules.d/')
+        else:
+            print('Please install PulseAudio or PipeWire and Alsa first.')
 
     else:
         jsonreq = requests.get('https://api.github.com/gists/c357291e4e5c18894bea10665dcebffb').json()
@@ -361,6 +363,8 @@ def install_audiofix(model_id):
                     os.remove('91-pulseaudio-custom.rules')
                     wget.download('https://raw.githubusercontent.com/appleplectic/T2-Misc/main/91-pulseaudio-custom.rules')
                     shutil.move(fname, '/usr/lib/udev/rules.d/')
+        else:
+            print('Please install PulseAudio or PipeWire and Alsa first.')
 
 
 
