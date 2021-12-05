@@ -95,7 +95,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['pacman', f'-U {filename}', '--noconfirm'])
+                subprocess.run(f'pacman -U {filename} --noconfirm', shell=True)
         elif distro == 'debian':
             # Have to use 5.13.15 and not 5.13.19
             jsonreq = requests.get("https://api.github.com/repos/marcosfad/mbp-ubuntu-kernel/releases/49398102").json()
@@ -104,7 +104,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['apt-get', 'install', f'./{filename}', '-y'])
+                subprocess.run(f'apt-get install ./{filename} -y', shell=True)
         elif distro == 'fedora':
             # Have to use mbp16 one
             jsonreq = requests.get('https://api.github.com/repos/mikeeq/mbp-fedora-kernel/releases/43328558').json()
@@ -115,7 +115,7 @@ def install_kernel(distro:str, ver:str):
                 if 'packages.zip' in url or 'sha256' in url:
                     continue
                 filename = wget.download(url)
-                subprocess.run(['rpm', f'-i {filename}'])
+                subprocess.run(f'rpm -i {filename}', shell=True)
 
     elif ver == 'mojave':
         if distro == 'arch':
@@ -125,7 +125,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['pacman', f'-U {filename}', '--noconfirm'])
+                subprocess.run(f'pacman -U {filename} --noconfirm', shell=True)
         elif distro == 'debian':
             # Have to use 5.13.15 and not 5.13.19
             jsonreq = requests.get("https://api.github.com/repos/marcosfad/mbp-ubuntu-kernel/releases/49397674").json()
@@ -134,7 +134,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['apt-get', 'install', f'./{filename}', '-y'])
+                subprocess.run(f'apt-get install ./{filename} -y', shell=True)
         elif distro == 'fedora':
             jsonreq = requests.get('https://api.github.com/repos/mikeeq/mbp-fedora-kernel/releases/latest').json()
             download_urls = []
@@ -144,14 +144,14 @@ def install_kernel(distro:str, ver:str):
                 if 'packages.zip' in url or 'sha256' in url:
                     continue
                 filename = wget.download(url)
-                subprocess.run(['rpm', f'-i {filename}'])
+                subprocess.run(f'rpm -i {filename}')
 
 
 
 def install_bce(distro:str):
 
     if distro == 'arch':
-        subprocess.run(['pacman', '-S dkms', '--noconfirm'])
+        subprocess.run('pacman -S dkms --noconfirm', shell=True)
         jsonreq = requests.get('https://api.github.com/repos/aunali1/apple-bce-arch/releases/latest').json()
         download_urls = []
         for dic in jsonreq['assets']:
@@ -160,12 +160,12 @@ def install_bce(distro:str):
             if not url.endswith('pkg.tar.zst') or not 'apple-bce-dkms-git' in url:
                 continue
             filename = wget.download(url)
-        subprocess.run(['pacman', f'-U {filename}', '--noconfirm'])
+        subprocess.run(f'pacman -U {filename} --noconfirm', shell=True)
     elif distro == 'debian' or distro == 'fedora':
         if distro == 'debian':
-            subprocess.run(['apt-get', 'install', 'dkms', '-y'])
+            subprocess.run('apt-get install dkms -y', shell=True)
         else:
-            subprocess.run(['dnf', 'install', 'dkms', '-y'])
+            subprocess.run('dnf install dkms -y', shell=True)
 
         pygit2.clone_repository('https://github.com/t2linux/apple-bce-drv', '/usr/src/apple-bce-r183.c884d9c')
         with open('/usr/src/apple-bce-r183.c884d9c/dkms.conf', 'w', encoding='utf-8') as conf:
@@ -186,7 +186,7 @@ AUTOINSTALL="yes"
             file = file.replace('vmlinuz-', '')
             kernels.append(file)
         for kernel in kernels:
-            subprocess.run(['dkms', 'install', '-m apple-bce', '-v r183.c884d9c', f'-k {kernel}'])
+            subprocess.run(f'dkms install -m apple-bce -v r183.c884d9c -k {kernel}', shell=True)
 
 
 
@@ -195,14 +195,14 @@ def install_ib(distro:str, tb_config_num:str, backlight:bool):
     if distro == 'arch':
         subprocess.run('pacman -S dkms --noconfirm', shell=True)
     elif distro == 'debian':
-        subprocess.run(['apt-get', 'install', 'dkms', '-y'])
+        subprocess.run('apt-get install dkms -y', shell=True)
     elif distro == 'fedora':
-        subprocess.run(['dnf', 'install', 'dkms', '-y'])
+        subprocess.run('dnf install dkms -y', shell=True)
 
     try:
         os.mkdir('/usr/src/apple-ibridge-0.1')
     except FileExistsError:
-        os.rmdir('/usr/src/apple-ibridge-0.1')
+        shutil.rmtree('/usr/src/apple-ibridge-0.1')
         os.mkdir('/usr/src/apple-ibridge-0.1')
 
     if backlight:
@@ -219,11 +219,11 @@ def install_ib(distro:str, tb_config_num:str, backlight:bool):
         file = file.replace('vmlinuz-', '')
         kernels.append(file)
     for kernel in kernels:
-        subprocess.run(['dkms', 'install', '-m apple-ibridge', '-v 0.1', f'-k {kernel}'])
+        subprocess.run(f'dkms install -m apple-ibridge -v 0.1 -k {kernel}', shell=True)
 
-    subprocess.run(['modprobe', 'apple_bce'])
-    subprocess.run('modprobe', 'apple_ib_tb')
-    subprocess.run(['modprobe', 'apple_ib_als'])
+    subprocess.run('modprobe apple_bce', shell=True)
+    subprocess.run('modprobe apple_ib_tb', shell=True)
+    subprocess.run('modprobe apple_ib_als', shell=True)
 
     with open('/etc/modules-load.d/t2.conf', 'w', encoding='utf-8') as t2conf:
         t2conf.write('apple-bce\napple-ib-tb\napple-ib-als\nbrcmfmac')
@@ -384,7 +384,7 @@ def modify_grub():
     with open('/etc/default/grub', 'w', encoding='utf-8') as grub:
         grub.write(nlines)
 
-    subprocess.run('grub-mkconfig -o /boot/grub/grub.cfg')
+    subprocess.run('grub-mkconfig -o /boot/grub/grub.cfg', shell=True)
 
 
 if __name__ == '__main__':
@@ -402,7 +402,7 @@ if __name__ == '__main__':
         pass
     os.chdir('/tmp/install-t2')
 
-    unparsed = subprocess.check_output(['lspci', '-d \'14e4:*\'']).decode('utf-8')
+    unparsed = subprocess.check_output('lspci -d \'14e4:*\'', shell=True).decode('utf-8')
     lspci = re.search(r'BCM(\d{4})', unparsed).group(1)
 
     # ArgParse
@@ -450,11 +450,11 @@ if __name__ == '__main__':
     wifi_id = parsed.wifi_chipset
 
     if DISTRO == 'debian':
-        subprocess.run(['apt-get', 'update'])
+        subprocess.run('apt-get update', shell=True)
     elif DISTRO == 'arch':
-        subprocess.run(['pacman', '-Sy', '--noconfirm'])
+        subprocess.run('pacman -Sy --noconfirm', shell=True)
     elif DISTRO == 'fedora':
-        subprocess.run(['dnf', 'check-update', '-y'])
+        subprocess.run('dnf check-update -y', shell=True)
 
 
     if not parsed.no_wifi:
