@@ -1,6 +1,6 @@
 # install-t2-drivers
 
-**WARNING: EXTREMELY UNSTABLE.** Currently undergoing rigorous testing. **USE AT YOUR OWN RISK!**
+**WARNING: UNSTABLE.** Currently undergoing rigorous testing. **USE AT YOUR OWN RISK!**
 
 A Python script that installs the T2 Linux drivers for you.
 
@@ -26,9 +26,16 @@ sudo pip3 install -r requirements.txt
 ```
 
 
+## Stability
+
+- Arch Linux & Arch-based distros: **BETA**
+- Debian & Debian-based distros: **UNSTABLE**
+- Fedora & Fedora-based distros: **EXTREMELY UNSTABLE**
+
+
 ## To-Do
 
-- Test Debian-based distros (SOON)
+- Test Debian-based distros (IN PROGRESS)
 - Test Arch-based distros (IN PROGRESS)
 - Test Fedora-based distros (LATER)
 - Eopkg support (LATER)

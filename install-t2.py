@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 # install-t2.py
 
-# WARNING: EXTREMELY UNSTABLE
+# WARNING: UNSTABLE
 
 # This is a script that installs necessary drivers for the MacBook Pro 16,1
 # Copyright (C) 2021 Appleplectic
