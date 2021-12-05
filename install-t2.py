@@ -368,13 +368,6 @@ if __name__ == '__main__':
     with open('/sys/devices/virtual/dmi/id/product_name', 'r', encoding='utf-8') as productname:
         model_id = productname.read().strip('\n').strip()
 
-    # chdir to /tmp
-    try:
-        os.mkdir('/tmp/install-t2')
-    except FileExistsError:
-        shutil.rmtree('/tmp/install-t2')
-        os.mkdir('/tmp/install-t2')
-    os.chdir('/tmp/install-t2')
 
     unparsed = subprocess.check_output('lspci -d \'14e4:*\'', shell=True).decode('utf-8')
     try:
@@ -413,6 +406,14 @@ if __name__ == '__main__':
     # Check if script is run with root
     if os.geteuid() != 0:
         raise EnvironmentError('Script must be run with root privileges.')
+
+    # chdir to /tmp
+    try:
+        os.mkdir('/tmp/install-t2')
+    except FileExistsError:
+        shutil.rmtree('/tmp/install-t2')
+        os.mkdir('/tmp/install-t2')
+    os.chdir('/tmp/install-t2')
 
     if os.path.isfile('/usr/bin/apt-get'):
         DISTRO = 'debian'
