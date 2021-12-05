@@ -399,7 +399,7 @@ if __name__ == '__main__':
     kernels = parser.add_argument_group('kernels')
     kernels.add_argument('--mojave', action='store_true', help='Install the Mojave-patched WiFi kernel')
     kernels.add_argument('--bigsur', action='store_true', help='Install the Big Sur-patched WiFi kernel')
-    parser.add_argument('--no-kernel', action='store_true', help='Don\'t install the custom kernel')
+    kernels.add_argument('--no-kernel', action='store_true', help='Don\'t install the custom kernel')
 
     parsed = parser.parse_args()
 
@@ -497,7 +497,7 @@ if __name__ == '__main__':
 
     # Audio
     if not parsed.no_audio:
-        install_audiofix(model_id)
+        install_audiofix(model_id, parsed.stereo)
 
 
     print('Script is complete!')
