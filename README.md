@@ -19,7 +19,7 @@ Permalink: https://tinyurl.com/install-t2
 - requests
 - wget
 
-Install `python3` and `python3-pip` with your package manager.
+Install `python3` and `python3-pygit2`, `python3-requests`, and `python3-wget` with your package manager. You could also use `python3-pip`:
 
 ```
 sudo pip3 install -r requirements.txt
@@ -33,6 +33,10 @@ sudo pip3 install -r requirements.txt
 - Test Fedora-based distros (LATER)
 - Eopkg support (LATER)
 
+
+## Notes
+
+- Manjaro has some weird dependency issues with PyGit2 - try changing to Manjaro's unstable branch
 
 
 ## Credits
