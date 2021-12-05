@@ -1,5 +1,7 @@
 # install-t2-drivers
 
+**WARNING: EXTREMELY UNSTABLE.** Currently undergoing rigorous testing. **USE AT YOUR OWN RISK!**
+
 A Python script that installs the T2 Linux drivers for you.
 
 See https://wiki.t2linux.org/ for how to get WiFi files, install drivers, view state of Linux on T2 Macs, etc.
@@ -8,28 +10,28 @@ Need help? The Discord is a great place to start: https://discord.gg/wAyMNZrmHR
 
 Permalink: https://tinyurl.com/install-t2
 
+
+
 ## Requirements
 - Python 3.7+
-- os, re, sys, shutil, subprocess, argparse (included with Python)
+- os, re, sys, shutil, subprocess, argparse (usually included with Python)
 - pygit2
 - requests
 - wget
 
-Install dependencies:
-```
-#Debian
-sudo apt-get install python3 python3-pip -y
-#Arch
-sudo pacman -S python3 python3-pip
+Install `python3` and `python3-pip` with your package manager.
 
-pip3 install -r requirements.txt
 ```
+sudo pip3 install -r requirements.txt
+```
+
 
 ## To-do
 
-TBD: Offline mode
+Coming Soon: Offline mode
 
 TBD: Auto select kernel
+
 
 
 ## Credits
