@@ -146,6 +146,8 @@ def install_kernel(distro:str, ver:str):
                 filename = wget.download(url)
                 subprocess.call(f'rpm -i {filename}')
 
+    with open('/etc/fstab', 'a') as fstab:
+        fstab.write('\nefivarfs /sys/firmware/efi/efivars efivarfs ro,remount 0 0')
 
 
 def install_bce(distro:str):
