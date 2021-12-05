@@ -54,20 +54,6 @@ import wget
 
 
 
-def check_compatibility():
-
-    if sys.version_info < (3,7,0):
-        raise EnvironmentError("Must be using Python 3.7+")
-    if os.geteuid() != 0:
-        raise EnvironmentError('Script must be run with root privileges.')
-
-    try:
-        requests.get('https://www.google.com/').status_code
-    except:
-        raise ConnectionRefusedError('This device does not appear to have an internet connection. Please connect Ethernet, then try again.') from None
-
-
-
 def install_wifi(model_id:str, wifi_id:str, filepaths:list):
 
     #Renaming & moving files to /lib/firmware/brcm
@@ -371,8 +357,13 @@ def install_audiofix(model_id:str, stereo:bool):
 
 if __name__ == '__main__':
 
-    # Check if the script can be run on this machine
-    check_compatibility()
+    if sys.version_info < (3,7,0):
+        raise EnvironmentError("Must be using Python 3.7+")
+
+    try:
+        requests.get('https://www.google.com/').status_code
+    except:
+        raise ConnectionRefusedError('This device does not appear to have an internet connection. Please connect Ethernet, then try again.') from None
 
     with open('/sys/devices/virtual/dmi/id/product_name', 'r', encoding='utf-8') as productname:
         model_id = productname.read().strip('\n').strip()
@@ -418,6 +409,10 @@ if __name__ == '__main__':
     parser.add_argument('--no-kernel', action='store_true', help='Don\'t install the custom kernel')
 
     parsed = parser.parse_args()
+
+    # Check if script is run with root
+    if os.geteuid() != 0:
+        raise EnvironmentError('Script must be run with root privileges.')
 
     if os.path.isfile('/usr/bin/apt-get'):
         DISTRO = 'debian'
