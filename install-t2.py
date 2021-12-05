@@ -362,30 +362,6 @@ def install_audiofix(model_id):
 
 
 
-def modify_grub():
-
-    if not os.path.isfile('/etc/default/grub'):
-        print('Failed to find /etc/default/grub. Skipping...')
-        return
-
-    shutil.copy('/etc/default/grub', '/etc/default/grub.old')
-
-    with open('/etc/default/grub', 'r', encoding='utf-8') as grub:
-        lines = grub.read()
-
-    for line in lines.splitlines():
-        if 'GRUB_CMDLINE_LINUX=""' in line:
-            line = line[:-2]
-            line += 'efi=noruntime pcie_ports=compat acpi_osi=linux iommu=pt intel_iommu=on"\n'
-            break
-
-    nlines = lines.replace('GRUB_CMDLINE_LINUX=""', line)
-
-    with open('/etc/default/grub', 'w', encoding='utf-8') as grub:
-        grub.write(nlines)
-
-    subprocess.call('grub-mkconfig -o /boot/grub/grub.cfg', shell=True)
-
 
 if __name__ == '__main__':
 
@@ -428,7 +404,6 @@ if __name__ == '__main__':
     kernels = parser.add_argument_group('kernels')
     kernels.add_argument('--mojave', action='store_true', help='Install the Mojave-patched WiFi kernel')
     kernels.add_argument('--bigsur', action='store_true', help='Install the Big Sur-patched WiFi kernel')
-    kernels.add_argument('--no-grub', action='store_true', help='Don\'t modify the /etc/default/grub file')
     parser.add_argument('--no-kernel', action='store_true', help='Don\'t install the custom kernel')
 
     parsed = parser.parse_args()
@@ -516,8 +491,5 @@ if __name__ == '__main__':
     if not parsed.no_audio:
         install_audiofix(model_id)
 
-    # GRUB
-    if not parsed.no_grub:
-        modify_grub()
 
     print('Script is complete!')
