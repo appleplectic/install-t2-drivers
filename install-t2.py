@@ -177,7 +177,15 @@ BUILT_MODULE_NAME[0]="apple-bce"
 DEST_MODULE_LOCATION[0]="/kernel/drivers/misc"
 AUTOINSTALL="yes"
 ''')
-        for kernel in os.listdir('/var/lib/initramfs-tools'):
+        vmlinuz = []
+        for file in os.listdir('/boot'):
+            if 'vmlinuz-' in file:
+                vmlinuz.append(file)
+        kernels = []
+        for file in vmlinuz:
+            file = file.replace('vmlinuz-', '')
+            kernels.append(file)
+        for kernel in kernels:
             subprocess.run(['dkms', 'install', '-m apple-bce', '-v r183.c884d9c', f'-k {kernel}'])
 
 
@@ -202,7 +210,15 @@ def install_ib(distro:str, tb_config_num:str, backlight:bool):
     else:
         pygit2.clone_repository('https://github.com/t2linux/apple-ib-drv', '/usr/src/apple-ibridge-0.1')
 
-    for kernel in os.listdir('/var/lib/initramfs-tools'):
+    vmlinuz = []
+    for file in os.listdir('/boot'):
+        if 'vmlinuz-' in file:
+            vmlinuz.append(file)
+    kernels = []
+    for file in vmlinuz:
+        file = file.replace('vmlinuz-', '')
+        kernels.append(file)
+    for kernel in kernels:
         subprocess.run(['dkms', 'install', '-m apple-ibridge', '-v 0.1', f'-k {kernel}'])
 
     subprocess.run(['modprobe', 'apple_bce'])
