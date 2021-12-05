@@ -95,7 +95,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['pacman', f'-U {filename}'])
+                subprocess.run(['pacman', f'-U {filename}', '--noconfirm'])
         elif distro == 'debian':
             # Have to use 5.13.15 and not 5.13.19
             jsonreq = requests.get("https://api.github.com/repos/marcosfad/mbp-ubuntu-kernel/releases/49398102").json()
@@ -125,7 +125,7 @@ def install_kernel(distro:str, ver:str):
                 download_urls.append(dic['browser_download_url'])
             for url in download_urls:
                 filename = wget.download(url)
-                subprocess.run(['pacman', f'-U {filename}'])
+                subprocess.run(['pacman', f'-U {filename}', '--noconfirm'])
         elif distro == 'debian':
             # Have to use 5.13.15 and not 5.13.19
             jsonreq = requests.get("https://api.github.com/repos/marcosfad/mbp-ubuntu-kernel/releases/49397674").json()
@@ -151,7 +151,7 @@ def install_kernel(distro:str, ver:str):
 def install_bce(distro:str):
 
     if distro == 'arch':
-        subprocess.run(['pacman', '-S dkms'])
+        subprocess.run(['pacman', '-S dkms', '--noconfirm'])
         jsonreq = requests.get('https://api.github.com/repos/aunali1/apple-bce-arch/releases/latest').json()
         download_urls = []
         for dic in jsonreq['assets']:
@@ -159,8 +159,8 @@ def install_bce(distro:str):
         for url in download_urls:
             if not url.endswith('pkg.tar.zst') or not 'apple-bce-dkms-git' in url:
                 continue
-            filename = wget(url)
-        subprocess.run(['pacman', f'-U {filename}'])
+            filename = wget.download(url)
+        subprocess.run(['pacman', f'-U {filename}', '--noconfirm'])
     elif distro == 'debian' or distro == 'fedora':
         if distro == 'debian':
             subprocess.run(['apt-get', 'install', 'dkms', '-y'])
@@ -185,13 +185,17 @@ AUTOINSTALL="yes"
 def install_ib(distro:str, tb_config_num:str, backlight:bool):
 
     if distro == 'arch':
-        subprocess.run(['pacman', '-S dkms'])
+        subprocess.run('pacman -S dkms --noconfirm', shell=True)
     elif distro == 'debian':
         subprocess.run(['apt-get', 'install', 'dkms', '-y'])
     elif distro == 'fedora':
         subprocess.run(['dnf', 'install', 'dkms', '-y'])
 
-    os.mkdir('/usr/src/apple-ibridge-0.1')
+    try:
+        os.mkdir('/usr/src/apple-ibridge-0.1')
+    except FileExistsError:
+        os.rmdir('/usr/src/apple-ibridge-0.1')
+        os.mkdir('/usr/src/apple-ibridge-0.1')
 
     if backlight:
         pygit2.clone_repository('https://github.com/Redecorating/apple-ib-drv', '/usr/src/apple-ibridge-0.1')
@@ -369,8 +373,6 @@ def modify_grub():
 
 if __name__ == '__main__':
 
-    print('This script installs T2 drivers on your Mac.')
-
     # Check if the script can be run on this machine
     check_compatibility()
 
@@ -378,10 +380,13 @@ if __name__ == '__main__':
         model_id = productname.read().strip().strip('\n')
 
     # chdir to /tmp
-    os.mkdir('/tmp/install-t2')
+    try:
+        os.mkdir('/tmp/install-t2')
+    except FileExistsError:
+        pass
     os.chdir('/tmp/install-t2')
 
-    unparsed = subprocess.check_output('lspci -d \'14e4:*\'').decode('utf-8')
+    unparsed = subprocess.check_output(['lspci', '-d \'14e4:*\'']).decode('utf-8')
     lspci = re.search(r'BCM(\d{4})', unparsed).group(1)
 
     # ArgParse
@@ -389,25 +394,25 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=DESC)
 
     bceaudio = parser.add_argument_group('bce/audio')
-    bceaudio.add_argument('-b', '--no-bce', action='store_true', help='Don\'t install the BCE drivers')
-    bceaudio.add_argument('-a', '--no-audio', action='store_true', help='Don\'t install the Audio configs')
+    bceaudio.add_argument('--no-bce', action='store_true', help='Don\'t install the BCE drivers')
+    bceaudio.add_argument('--no-audio', action='store_true', help='Don\'t install the Audio configs')
 
     wifi = parser.add_argument_group('wifi')
-    wifi.add_argument('-w', '--no-wifi', action='store_true', help='Don\'t install the WiFi firmware')
-    wifi.add_argument('-c', '--wifi-chipset', help='WiFi chipset number (i.e. 4364); see https://wiki.t2linux.org/guides/wifi/. Default tries to parse lspci', default=lspci)
-    wifi.add_argument('-f', '--filepaths', help='Absolute filepaths to the 3 WiFi firmware files (.trx, .clmb, & .txt), seperated by semicolons', default=None)
+    wifi.add_argument('--no-wifi', action='store_true', help='Don\'t install the WiFi firmware')
+    wifi.add_argument('--wifi-chipset', help='WiFi chipset number (i.e. 4364); see https://wiki.t2linux.org/guides/wifi/. Default tries to parse lspci', default=lspci)
+    wifi.add_argument('--filepaths', help='Absolute filepaths to the 3 WiFi firmware files (.trx, .clmb, & .txt), seperated by semicolons', default=None)
     wifi.add_argument('--ioreg', help='`ioreg -l | grep RequestedFiles` output (in one line) from macOS - tries to use this to download files online', default=None)
 
     ibridge = parser.add_argument_group('ibridge')
-    ibridge.add_argument('-i', '--no-ibridge', help='Don\'t install iBridge drivers.')
-    ibridge.add_argument('-n', '--ib-num', help='Configuration number for Touchbar (see: https://wiki.t2linux.org/guides/dkms/#module-configuration)', default='2')
+    ibridge.add_argument('--no-ibridge', help='Don\'t install iBridge drivers.')
+    ibridge.add_argument('--ib-num', help='Configuration number for Touchbar (see: https://wiki.t2linux.org/guides/dkms/#module-configuration)', default='2')
     ibridge.add_argument('--backlight', action='store_true', help='Install the Backlight drivers. WARNILE & ONLY FOR 16,1')
 
     kernels = parser.add_argument_group('kernels')
     kernels.add_argument('--mojave', action='store_true', help='Install the Mojave-patched WiFi kernel')
     kernels.add_argument('--bigsur', action='store_true', help='Install the Big Sur-patched WiFi kernel')
-    kernels.add_argument('-g', '--no-grub', action='store_true', help='Don\'t modify the /etc/default/grub file')
-    parser.add_argument('-k', '--no-kernel', action='store_true', help='Don\'t install the custom kernel')
+    kernels.add_argument('--no-grub', action='store_true', help='Don\'t modify the /etc/default/grub file')
+    parser.add_argument('--no-kernel', action='store_true', help='Don\'t install the custom kernel')
 
     parsed = parser.parse_args()
 
@@ -431,7 +436,7 @@ if __name__ == '__main__':
     if DISTRO == 'debian':
         subprocess.run(['apt-get', 'update'])
     elif DISTRO == 'arch':
-        subprocess.run(['pacman', '-Sy'])
+        subprocess.run(['pacman', '-Sy', '--noconfirm'])
     elif DISTRO == 'fedora':
         subprocess.run(['dnf', 'check-update', '-y'])
 
