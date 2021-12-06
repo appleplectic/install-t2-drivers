@@ -35,10 +35,9 @@ sudo pip3 install -r requirements.txt
 
 ## To-Do
 
-- Test Debian-based distros (IN PROGRESS)
+- Offline packages (IN PROGRESS)
 - Test Arch-based distros (IN PROGRESS)
 - Test Fedora-based distros (LATER)
-- Offline packages (LATER)
 
 
 ## Notes
