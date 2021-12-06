@@ -2,13 +2,13 @@
 
 **WARNING: UNSTABLE.** Currently undergoing rigorous testing. **USE AT YOUR OWN RISK!**
 
-A Python script that installs the T2 Linux drivers for you.
+A Python script that installs the T2 Linux drivers for you, probably used in chroot of Arch Linux, or after the install of an unsupported distro.
 
 See https://wiki.t2linux.org/ for how to get WiFi files, install drivers, view state of Linux on T2 Macs, etc.
 
-Need help? The Discord is a great place to start: https://discord.gg/wAyMNZrmHR
+Need help? The T2Linux Discord is a great place to start: https://discord.gg/wAyMNZrmHR
 
-Permalink: https://tinyurl.com/install-t2
+Permalink to script: https://tinyurl.com/install-t2
 
 
 
@@ -29,8 +29,8 @@ sudo pip3 install -r requirements.txt
 ## Stability
 
 - Arch Linux & Arch-based distros: **BETA**
-- Debian & Debian-based distros: **UNSTABLE**
-- Fedora & Fedora-based distros: **EXTREMELY UNSTABLE**
+- Debian & Debian-based distros: **ALPHA**
+- Fedora & Fedora-based distros: **UNTESTED**
 
 
 ## To-Do
@@ -38,7 +38,7 @@ sudo pip3 install -r requirements.txt
 - Test Debian-based distros (IN PROGRESS)
 - Test Arch-based distros (IN PROGRESS)
 - Test Fedora-based distros (LATER)
-- Eopkg support (LATER)
+- Offline packages (LATER)
 
 
 ## Notes
