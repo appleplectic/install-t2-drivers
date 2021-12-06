@@ -451,7 +451,7 @@ if __name__ == '__main__':
 
         elif parsed.ioreg is not None:
             with open(parsed.ioreg, 'r', encoding='utf-8') as file:
-                research = re.search(r'"Firmware"="(.*?)"(.*?)"Regulatory"="(.*?)"(.*?)"NVRAM"="(.*?)"', file)
+                research = re.search(r'"Firmware"="(.*?)"(.*?)"Regulatory"="(.*?)"(.*?)"NVRAM"="(.*?)"', file.read())
             filelist = []
             filelist.append(research.group(1))
             filelist.append(research.group(3))
