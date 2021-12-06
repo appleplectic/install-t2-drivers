@@ -374,7 +374,7 @@ if __name__ == '__main__':
     wifi.add_argument('--no-wifi', action='store_true', help='Don\'t install the WiFi firmware')
     wifi.add_argument('--wifi-chipset', help='WiFi chipset number (i.e. 4364); see https://wiki.t2linux.org/guides/wifi/. Default tries to parse lspci', default=lspci)
     wifi.add_argument('--filepaths', help='Absolute filepaths to the 3 WiFi firmware files (.trx, .clmb, & .txt), seperated by semicolons', default=None)
-    wifi.add_argument('--ioreg', help='`ioreg -l | grep RequestedFiles` output (in one line) from macOS - tries to use this to download files online', default=None)
+    wifi.add_argument('--ioreg', help='Absolute filepath to ioreg output; `ioreg -l | grep RequestedFiles` output from macOS - tries to use this to download files online', default=None)
 
     ibridge = parser.add_argument_group('ibridge')
     ibridge.add_argument('--no-ibridge', help='Don\'t install iBridge drivers.')
@@ -444,7 +444,8 @@ if __name__ == '__main__':
             install_wifi(model_id, wifi_id, escaped)
 
         elif parsed.ioreg is not None:
-            research = re.search(r'"Firmware"="(.*?)"(.*?)"Regulatory"="(.*?)"(.*?)"NVRAM"="(.*?)"', parsed.ioreg)
+            with open(parsed.ioreg, 'r', encoding='utf-8') as file:
+                research = re.search(r'"Firmware"="(.*?)"(.*?)"Regulatory"="(.*?)"(.*?)"NVRAM"="(.*?)"', file)
             filelist = []
             filelist.append(research.group(1))
             filelist.append(research.group(3))
@@ -457,7 +458,8 @@ if __name__ == '__main__':
                     try:
                         fname = wget.download('https://packages.aunali1.com/apple/wifi-fw/18G2022/' + file)
                     except HTTPError:
-                        raise FileNotFoundError(f'Failed to download WiFi file {file}. It may not be in the archives.') from None
+                        print(f'Failed to download WiFi file {file}. It may not be in the archives.')
+                        print('Continuing...')
                 filepaths.append(os.getcwd() + '/' + fname)
             install_wifi(model_id, wifi_id, filepaths)
 
