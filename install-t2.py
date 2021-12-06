@@ -350,9 +350,6 @@ if __name__ == '__main__':
     except:
         raise ConnectionRefusedError('This device does not appear to have an internet connection. Please connect Ethernet, then try again.') from None
 
-    with open('/sys/devices/virtual/dmi/id/product_name', 'r', encoding='utf-8') as productname:
-        model_id = productname.read().strip('\n').strip()
-
 
     unparsed = subprocess.check_output('lspci -d \'14e4:*\'', shell=True).decode('utf-8')
     try:
@@ -364,6 +361,8 @@ if __name__ == '__main__':
     # ArgParse
     DESC = 'Script to install drivers for T2 Macs.\nInstalls patched kernel, WiFi drivers, BCE drivers (for keyboard/touchpad), iBridge (touchbar), and Audio drivers.\nNeed help? See https://wiki.t2linux.org or https://discord.gg/fsaU8nbaRT!'
     parser = argparse.ArgumentParser(description=DESC)
+
+    parser.add_argument('--force-model', help='Force a Mac model - no spaces, correct capitilization, i.e. "MacBookPro16,1"', default=None)
 
     bceaudio = parser.add_argument_group('bce/audio')
     bceaudio.add_argument('--no-bce', action='store_true', help='Don\'t install the BCE drivers')
@@ -387,6 +386,13 @@ if __name__ == '__main__':
     kernels.add_argument('--no-kernel', action='store_true', help='Don\'t install the custom kernel')
 
     parsed = parser.parse_args()
+
+
+    if parsed.force_model is None:
+        model_id = parsed.force_model
+    else:
+        with open('/sys/devices/virtual/dmi/id/product_name', 'r', encoding='utf-8') as productname:
+            model_id = productname.read().strip('\n').strip()
 
     # Check if script is run with root
     if os.geteuid() != 0:
