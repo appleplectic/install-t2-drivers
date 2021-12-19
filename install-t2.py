@@ -260,7 +260,7 @@ def install_audiofix(model_id:str, stereo:bool):
                     shutil.move(fname, '/usr/share/alsa-card-profile/mixer/profile-sets/')
                 elif fname == '91-pulseaudio-custom.rules':
                     os.remove('91-pulseaudio-custom.rules')
-                    wget.download('https://raw.githubusercontent.com/appleplectic/T2-Misc/main/91-pulseaudio-custom.rules')
+                    wget.download('https://raw.githubusercontent.com/appleplectic/install-t2-drivers/main/91-pulseaudio-custom.rules')
                     shutil.move(fname, '/usr/lib/udev/rules.d/')
                 elif fname == 'default.pa':
                     shutil.move(fname, home + '/.config/pulse/')
@@ -298,7 +298,7 @@ def install_audiofix(model_id:str, stereo:bool):
                     shutil.move(fname, '/usr/share/alsa-card-profile/mixer/profile-sets/')
                 elif fname == '91-pulseaudio-custom.rules':
                     os.remove('91-pulseaudio-custom.rules')
-                    wget.download('https://raw.githubusercontent.com/appleplectic/T2-Misc/main/91-pulseaudio-custom.rules')
+                    wget.download('https://raw.githubusercontent.com/appleplectic/install-t2-drivers/main/91-pulseaudio-custom.rules')
                     shutil.move(fname, '/usr/lib/udev/rules.d/')
         else:
             print('Please install PulseAudio or PipeWire first.')
@@ -332,7 +332,7 @@ def install_audiofix(model_id:str, stereo:bool):
                     shutil.move(fname, '/usr/share/alsa-card-profile/mixer/profile-sets/')
                 elif fname == '91-pulseaudio-custom.rules':
                     os.remove('91-pulseaudio-custom.rules')
-                    wget.download('https://raw.githubusercontent.com/appleplectic/T2-Misc/main/91-pulseaudio-custom.rules')
+                    wget.download('https://raw.githubusercontent.com/appleplectic/install-t2-drivers/main/91-pulseaudio-custom.rules')
                     shutil.move(fname, '/usr/lib/udev/rules.d/')
         else:
             print('Please install PulseAudio or PipeWire first.')
